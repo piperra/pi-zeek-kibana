@@ -1,0 +1,42 @@
+filebeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: false
+
+filebeat.modules:
+- module: zeek
+  connection:
+    enabled: true
+    var.paths:
+      - /filebeat/pcap/conn*.log    
+  dns:
+    enabled: true
+    var.paths:
+      - /filebeat/pcap/dns*.log
+  http:
+    enabled: true
+    var.paths:
+      - /filebeat/pcap/http*.log
+  files:
+    enabled: true
+    var.paths:
+      - /filebeat/pcap/files*.log
+  ssl:
+    enabled: true
+    var.paths:
+      - /filebeat/pcap/ssl*.log
+  notice:
+    enabled: true
+    var.paths:
+      - /filebeat/pcap/notice*.log
+
+processors:
+- add_cloud_metadata: ~
+
+output.elasticsearch:
+  hosts: '${ELASTICSEARCH_HOSTS:elasticsearch:9200}'
+  username: '${ELASTICSEARCH_USERNAME:}'
+  password: '${ELASTICSEARCH_PASSWORD:}'
+
+setup.kibana:
+  host: '${KIBANA_HOST:kibana:5601}'

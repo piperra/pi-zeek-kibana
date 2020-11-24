@@ -1,0 +1,46 @@
+version: "3"
+services:
+  elasticsearch:
+    image: piperra/elasticsearch:7.10.0-arm64
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+    networks:
+      - elastinet
+
+  kibana:
+    depends_on:
+      - elasticsearch
+    image: piperra/kibana:7.10.0-arm64
+    ports:
+      - "5601:5601"
+    links:
+      - elasticsearch
+    networks:
+      - elastinet
+
+  filebeat:
+    depends_on:
+      - kibana
+    image: piperra/filebeat:7.10.0-arm64
+    links:
+      - kibana
+      - elasticsearch
+    volumes:
+      - ./pcap:/pcap
+    networks:
+      - elastinet
+
+  zeek:
+    depends_on:
+      - filebeat
+    image: piperra/zeek:3.2.2-arm64
+    volumes:
+      - ./pcap:/pcap
+    networks:
+      - elastinet
+    command: 
+
+networks:
+  elastinet:
