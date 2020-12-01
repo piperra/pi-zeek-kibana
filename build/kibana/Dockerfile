@@ -9,7 +9,7 @@ ENV GPG_KEY "4609 5ACC 8548 582C 1A26 99A9 D27D 666C D88E 42B4"
 
 ENV PATH /usr/share/kibana/bin:$PATH
 
-RUN apk add --no-cache bash su-exec
+RUN apk add --no-cache bash su-exec curl bash
 RUN apk add --no-cache -t .build-deps wget ca-certificates gnupg openssl \
   && set -ex \
   && cd /tmp \
@@ -42,9 +42,11 @@ RUN apk add --no-cache -t .build-deps wget ca-certificates gnupg openssl \
 RUN echo 'server.host: "0.0.0.0"' >  /usr/share/kibana/config/kibana.yml
 RUN echo 'elasticsearch.hosts: ["http://elasticsearch:9200"]' >> /usr/share/kibana/config/kibana.yml
 
+COPY ./entrypoint.sh /usr/share/kibana/entrypoint.sh
+RUN chmod +x /usr/share/kibana/entrypoint.sh
+
 WORKDIR /usr/share/kibana
 
 EXPOSE 5601
 
-ENTRYPOINT ["kibana"]
-CMD ["--allow-root"]
+ENTRYPOINT ["./entrypoint.sh"]

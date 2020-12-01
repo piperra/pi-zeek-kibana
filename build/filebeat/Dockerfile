@@ -26,6 +26,9 @@ RUN echo "Size of the Filebeat install..." \
 
 FROM debian:buster
 
+RUN apt update \
+  && apt install -y curl jq
+
 RUN mkdir /filebeat \
   && mkdir /filebeat/module \
   && mkdir /filebeat/modules.d \
@@ -37,12 +40,10 @@ COPY --from=builder /go/beats/x-pack/filebeat/module /filebeat/module
 COPY --from=builder /go/beats/x-pack/filebeat/modules.d /filebeat/module
 COPY --from=builder /go/beats/x-pack/filebeat/kibana /filebeat/kibana
 COPY ./filebeat.yml /filebeat/filebeat.yml
+COPY ./entrypoint.sh /filebeat/entrypoint.sh
+
+RUN chmod +x /filebeat/entrypoint.sh
 
 WORKDIR /filebeat
-
-RUN echo "#!/bin/sh" > entrypoint.sh \
-  && echo "./filebeat setup --modules zeek -e -E 'setup.dashboards.enabled=true'" >> entrypoint.sh \
-  && echo "./filebeat -e" >> entrypoint.sh \
-  && chmod +x entrypoint.sh
 
 ENTRYPOINT ["./entrypoint.sh"]

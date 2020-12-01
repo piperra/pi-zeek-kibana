@@ -1,7 +1,7 @@
 version: "3"
 services:
   elasticsearch:
-    image: piperra/elasticsearch:7.10.0-arm64
+    build: ./elasticsearch
     environment:
       - discovery.type=single-node
     ports:
@@ -12,7 +12,9 @@ services:
   kibana:
     depends_on:
       - elasticsearch
-    image: piperra/kibana:7.10.0-arm64
+    build: ./kibana
+    environment:
+      - xpack.reporting.enabled=false
     ports:
       - "5601:5601"
     links:
@@ -23,24 +25,24 @@ services:
   filebeat:
     depends_on:
       - kibana
-    image: piperra/filebeat:7.10.0-arm64
+    build: ./filebeat
     links:
       - kibana
       - elasticsearch
     volumes:
-      - ./pcap:/pcap
+      - ./pcap:/filebeat/pcap
     networks:
       - elastinet
 
   zeek:
     depends_on:
       - filebeat
-    image: piperra/zeek:3.2.2-arm64
+    build: ./zeek
+    cap_add: ['NET_RAW']
+    network_mode: host
     volumes:
       - ./pcap:/pcap
-    networks:
-      - elastinet
-    command: 
+    command:  -i af_packet::wlan0 local
 
 networks:
   elastinet:

@@ -6,19 +6,17 @@ services:
       - discovery.type=single-node
     ports:
       - "9200:9200"
-    networks:
-      - elastinet
 
   kibana:
     depends_on:
       - elasticsearch
     image: piperra/kibana:7.10.0-arm64
+    environment:
+      - xpack.reporting.enabled=false
     ports:
       - "5601:5601"
     links:
       - elasticsearch
-    networks:
-      - elastinet
 
   filebeat:
     depends_on:
@@ -28,9 +26,7 @@ services:
       - kibana
       - elasticsearch
     volumes:
-      - ./pcap:/pcap
-    networks:
-      - elastinet
+      - ./pcap:/filebeat/pcap
 
   zeek:
     depends_on:
@@ -42,5 +38,3 @@ services:
       - ./pcap:/pcap
     command:  -i af_packet::wlan0 local
 
-networks:
-  elastinet:
