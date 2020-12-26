@@ -4,6 +4,10 @@ services:
     image: piperra/elasticsearch:7.10.0-arm64
     environment:
       - discovery.type=single-node
+      - xpack.license.self_generated.type=trial
+      - xpack.security.enabled=true
+      - xpack.security.authc.api_key.enabled=true
+      - ELASTIC_PASSWORD=changeme
     ports:
       - "9200:9200"
 
@@ -13,6 +17,8 @@ services:
     image: piperra/kibana:7.10.0-arm64
     environment:
       - xpack.reporting.enabled=false
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=changeme
     ports:
       - "5601:5601"
     links:
@@ -22,6 +28,9 @@ services:
     depends_on:
       - kibana
     image: piperra/filebeat:7.10.0-arm64
+    environment:
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=changeme
     links:
       - kibana
       - elasticsearch

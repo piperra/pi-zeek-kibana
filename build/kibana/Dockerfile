@@ -41,6 +41,9 @@ RUN apk add --no-cache -t .build-deps wget ca-certificates gnupg openssl \
 
 RUN echo 'server.host: "0.0.0.0"' >  /usr/share/kibana/config/kibana.yml
 RUN echo 'elasticsearch.hosts: ["http://elasticsearch:9200"]' >> /usr/share/kibana/config/kibana.yml
+RUN  echo 'elasticsearch.username: "'\${ELASTICSEARCH_USERNAME}'"' >> /usr/share/kibana/config/kibana.yml
+RUN echo 'elasticsearch.password: "'\${ELASTICSEARCH_PASSWORD}'"' >> /usr/share/kibana/config/kibana.yml
+RUN echo 'xpack.encryptedSavedObjects.encryptionKey: "WWuNfvVaF0EerXuwugI18t26KiAOdtoF"' >> /usr/share/kibana/config/kibana.yml
 
 COPY ./entrypoint.sh /usr/share/kibana/entrypoint.sh
 RUN chmod +x /usr/share/kibana/entrypoint.sh
